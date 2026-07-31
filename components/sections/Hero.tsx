@@ -42,7 +42,7 @@ export const Hero: React.FC<HeroProps> = ({
             playsInline
             className="w-full h-full object-cover scale-100 filter brightness-100 contrast-105"
           >
-            <source src={videoUrl || '/videos/Sg_mobile.mp4'} type="video/mp4" />
+            <source src={videoUrl === '/videos/hero.mp4' ? '/videos/Sg_mobile.mp4' : (videoUrl || '/videos/Sg_mobile.mp4')} type="video/mp4" />
           </video>
         )}
         
