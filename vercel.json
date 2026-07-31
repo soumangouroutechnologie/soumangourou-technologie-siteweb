@@ -1,3 +1,5 @@
 {
-  "name": "soumangourou-technologie"
+  "name": "soumangourou-technologie",
+  "framework": "nextjs",
+  "buildCommand": "prisma generate && next build"
 }
