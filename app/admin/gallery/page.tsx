@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Plus, Trash2, Upload, RefreshCw } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface GalleryItem {
   id: string;
@@ -48,20 +49,27 @@ export default function AdminGalleryPage() {
 
     setUploading(true);
     try {
-      const data = new FormData();
-      data.append('file', file);
+      const ext = file.name.split('.').pop() || 'png';
+      const safeName = file.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+      const filename = `${Date.now()}-${safeName}.${ext}`;
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: data,
-      });
+      const { error } = await supabase.storage
+        .from('uploads')
+        .upload(filename, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      const result = await res.json();
-      if (result.url) {
-        setFormData((prev) => ({ ...prev, imageUrl: result.url }));
-      }
+      if (error) throw error;
+
+      const { data: publicUrlData } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(filename);
+      
+      setFormData((prev) => ({ ...prev, imageUrl: publicUrlData.publicUrl }));
     } catch (err) {
       console.error('Erreur upload:', err);
+      alert("Erreur lors du téléchargement de l'image. Veuillez réessayer avec une image plus petite.");
     } finally {
       setUploading(false);
     }
