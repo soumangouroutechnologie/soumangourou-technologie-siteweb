@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import { getAdminFromCookies } from '@/lib/auth';
+import { createClient } from '@supabase/supabase-js';
+import path from 'path';
+
+// Configure Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(request: Request) {
   const admin = await getAdminFromCookies();
@@ -20,10 +25,6 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Ensure public/uploads directory exists
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadsDir, { recursive: true });
-
     // Clean filename
     const ext = path.extname(file.name) || '.png';
     const safeBaseName = path
@@ -31,14 +32,28 @@ export async function POST(request: Request) {
       .toLowerCase()
       .replace(/[^a-z0-9]/g, '-');
     const filename = `${Date.now()}-${safeBaseName}${ext}`;
-    const filePath = path.join(uploadsDir, filename);
 
-    await writeFile(filePath, buffer);
+    // Upload to Supabase Storage
+    const { error } = await supabase.storage
+      .from('uploads')
+      .upload(filename, buffer, {
+        contentType: file.type || 'image/png',
+        upsert: false
+      });
 
-    const publicUrl = `/uploads/${filename}`;
-    return NextResponse.json({ url: publicUrl, success: true });
+    if (error) {
+      console.error('Supabase upload error:', error);
+      throw new Error(error.message);
+    }
+
+    // Get the public URL for the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from('uploads')
+      .getPublicUrl(filename);
+
+    return NextResponse.json({ url: publicUrlData.publicUrl, success: true });
   } catch (error: any) {
     console.error('Error uploading file:', error);
-    return NextResponse.json({ error: error.message || 'Erreur d\'upload' }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Erreur d'upload" }, { status: 500 });
   }
 }
