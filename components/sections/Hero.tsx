@@ -33,30 +33,39 @@ export const Hero: React.FC<HeroProps> = ({
         {/* Pointer-events-none prevents clicking on the video */}
         {isMounted && (
           <div 
-            className="absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] pointer-events-none opacity-90"
-            style={{ transform: 'translate(-50%, -50%) scale(1.3)' }}
+            className="absolute top-1/2 left-1/2 pointer-events-none opacity-90"
+            style={{ 
+              width: '100vw', 
+              height: '56.25vw', 
+              minHeight: '100vh', 
+              minWidth: '178vh', 
+              transform: 'translate(-50%, -50%) scale(1.3)' 
+            }}
           >
-            <ReactPlayer
-              url={videoUrl || 'https://www.youtube.com/watch?v=gqCirSU7aT8'}
-              playing={true}
-              muted={isMuted}
-              loop={true}
-              controls={false}
-              width="100%"
-              height="100%"
-              config={({
+            {React.createElement(ReactPlayer as any, {
+              url: videoUrl || 'https://www.youtube.com/watch?v=gqCirSU7aT8',
+              playing: true,
+              muted: isMuted,
+              loop: true,
+              controls: false,
+              width: "100%",
+              height: "100%",
+              config: {
                 youtube: {
                   playerVars: {
+                    autoplay: 1,
+                    mute: 1,
                     modestbranding: 1,
                     rel: 0,
                     showinfo: 0,
                     controls: 0,
                     disablekb: 1,
                     playsinline: 1,
+                    iv_load_policy: 3,
                   }
                 }
-              }) as any}
-            />
+              }
+            })}
           </div>
         )}
         
