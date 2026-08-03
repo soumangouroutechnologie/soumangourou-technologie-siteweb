@@ -48,8 +48,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
           >
             <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-brand-gold/30">
               <Image
-                src={settings?.aboutImageUrl || "/images/about-african-king.png"}
-                alt="SOUMANGOUROU Patrimoine & Vision"
+                src={settings?.aboutImageUrl || "/images/about-african-innovation.png"}
+                alt="SOUMANGOUROU Innovation & Vision"
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"
                 className="object-cover object-center hover:scale-105 transition-transform duration-700"
