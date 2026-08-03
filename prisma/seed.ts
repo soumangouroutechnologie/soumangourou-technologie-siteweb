@@ -29,7 +29,7 @@ async function main() {
       heroTitle: 'SOUMANGOUROU TECHNOLOGIE',
       heroSubtitle: 'Nous concevons des solutions digitales modernes pour accompagner les entreprises africaines vers l\'excellence.',
       heroVideoUrl: '/videos/hero.mp4',
-      companyEmail: 'contact@soumangourou.tech',
+      companyEmail: 'info@soumangouroutechnologie.com',
       companyPhone: '+225 07 08 09 10 11',
       companyAddress: 'Abidjan, Côte d\'Ivoire',
       mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127108.64724773802!2d-4.049449830578613!3d5.348443905470125!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfb8e34927f8a7e5%3A0x6b772413158f4a3e!2sAbidjan%2C%20C%C3%B4te%20d\'Ivoire!5e0!3m2!1sfr!2sfr!4v1700000000000!5m2!1sfr!2sfr',
@@ -124,7 +124,7 @@ async function main() {
       images: [
         'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80'
       ],
-      liveUrl: 'https://soumangourou.tech',
+      liveUrl: 'https://soumangouroutechnologie.com',
       technologies: ['Next.js', 'Framer Motion', 'Tailwind CSS'],
       categoryId: catWeb.id,
       isFeatured: true,
@@ -139,7 +139,7 @@ async function main() {
       images: [
         'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80'
       ],
-      liveUrl: 'https://soumangourou.tech',
+      liveUrl: 'https://soumangouroutechnologie.com',
       technologies: ['Next.js', 'Prisma', 'TypeScript', 'SEO'],
       categoryId: catWeb.id,
       isFeatured: true,

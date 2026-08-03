@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'SOUMANGOUROU TECHNOLOGIE',
     description: 'Solutions digitales modernes inspirées de l\'héritage africain.',
-    url: 'https://soumangourou.tech',
+    url: 'https://soumangouroutechnologie.com',
     siteName: 'SOUMANGOUROU TECHNOLOGIE',
     locale: 'fr_FR',
     type: 'website',
@@ -47,8 +47,8 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'SOUMANGOUROU TECHNOLOGIE',
-    url: 'https://soumangourou.tech',
-    logo: 'https://soumangourou.tech/images/hero-african-king.png',
+    url: 'https://soumangouroutechnologie.com',
+    logo: 'https://soumangouroutechnologie.com/images/hero-african-king.png',
     description: 'Solutions digitales modernes inspirées par notre héritage africain.',
     address: {
       '@type': 'PostalAddress',
@@ -59,7 +59,7 @@ export default function RootLayout({
       '@type': 'ContactPoint',
       telephone: '+2250708091011',
       contactType: 'customer service',
-      email: 'contact@soumangourou.tech',
+      email: 'info@soumangouroutechnologie.com',
     },
   };
 

@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS "settings" (
     "heroTitle" TEXT DEFAULT 'SOUMANGOUROU TECHNOLOGIE' NOT NULL,
     "heroSubtitle" TEXT DEFAULT 'Nous créons des solutions numériques modernes inspirées par notre héritage africain.' NOT NULL,
     "heroVideoUrl" TEXT DEFAULT '/videos/hero.mp4' NOT NULL,
-    "companyEmail" TEXT DEFAULT 'contact@soumangourou.tech' NOT NULL,
+    "companyEmail" TEXT DEFAULT 'info@soumangouroutechnologie.com' NOT NULL,
     "companyPhone" TEXT DEFAULT '+225 07 08 09 10 11' NOT NULL,
     "companyAddress" TEXT DEFAULT 'Abidjan, Côte d''Ivoire' NOT NULL,
     "mapEmbedUrl" TEXT,

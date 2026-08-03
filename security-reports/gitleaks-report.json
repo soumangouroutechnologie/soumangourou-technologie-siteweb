@@ -1,1 +1,23 @@
-[]
+[
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 13,
+  "EndLine": 13,
+  "StartColumn": 19,
+  "EndColumn": 109,
+  "Match": "NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI",
+  "Secret": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI",
+  "File": "security-reports/semgrep-report.txt",
+  "SymlinkFile": "",
+  "Commit": "35fd43722b62394a702c310bd59c13f4bb6277c9",
+  "Link": "https://github.com/soumangouroutechnologie/soumangourou-technologie-siteweb/blob/35fd43722b62394a702c310bd59c13f4bb6277c9/security-reports/semgrep-report.txt#L13",
+  "Entropy": 4.800548,
+  "Author": "Kévin Stéphane Assamoi",
+  "Email": "stephanekevinassamoi@gmail.com",
+  "Date": "2026-07-31T11:27:31Z",
+  "Message": "Initial commit",
+  "Tags": [],
+  "Fingerprint": "35fd43722b62394a702c310bd59c13f4bb6277c9:security-reports/semgrep-report.txt:generic-api-key:13"
+ }
+]

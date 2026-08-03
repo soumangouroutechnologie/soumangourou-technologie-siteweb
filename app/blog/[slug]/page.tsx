@@ -105,7 +105,7 @@ export default async function BlogPostDetailPage({ params }: { params: Promise<{
               <Share2 className="w-3.5 h-3.5 text-brand-gold" /> Partager:
             </span>
             <a
-              href={`https://www.facebook.com/sharer/sharer.php?u=https://soumangourou.tech/blog/${post.slug}`}
+              href={`https://www.facebook.com/sharer/sharer.php?u=https://soumangouroutechnologie.com/blog/${post.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-full bg-brand-darkCard border border-brand-gold/20 text-brand-gold hover:bg-brand-gold hover:text-brand-dark transition-all"
@@ -113,7 +113,7 @@ export default async function BlogPostDetailPage({ params }: { params: Promise<{
               <FacebookIcon className="w-3.5 h-3.5" />
             </a>
             <a
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=https://soumangourou.tech/blog/${post.slug}`}
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=https://soumangouroutechnologie.com/blog/${post.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-full bg-brand-darkCard border border-brand-gold/20 text-brand-gold hover:bg-brand-gold hover:text-brand-dark transition-all"
@@ -121,7 +121,7 @@ export default async function BlogPostDetailPage({ params }: { params: Promise<{
               <LinkedinIcon className="w-3.5 h-3.5" />
             </a>
             <a
-              href={`https://twitter.com/intent/tweet?url=https://soumangourou.tech/blog/${post.slug}`}
+              href={`https://twitter.com/intent/tweet?url=https://soumangouroutechnologie.com/blog/${post.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-full bg-brand-darkCard border border-brand-gold/20 text-brand-gold hover:bg-brand-gold hover:text-brand-dark transition-all"
