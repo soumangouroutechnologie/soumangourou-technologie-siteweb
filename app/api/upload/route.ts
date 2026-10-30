@@ -3,10 +3,21 @@ import { getAdminFromCookies } from '@/lib/auth';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 
-// Configure Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+function getSupabase() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+  return createClient(supabaseUrl, supabaseKey);
+}
+
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/avif',
+]);
+const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 export async function POST(request: Request) {
   const admin = await getAdminFromCookies();
@@ -22,11 +33,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Aucun fichier fourni' }, { status: 400 });
     }
 
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: 'Fichier trop volumineux (maximum 5 Mo)' },
+        { status: 400 }
+      );
+    }
+
+    const ext = (path.extname(file.name) || '.png').toLowerCase();
+    if (!ALLOWED_MIME_TYPES.has(file.type) || !ALLOWED_EXTENSIONS.has(ext)) {
+      return NextResponse.json(
+        { error: 'Format de fichier non autorisé (JPG, PNG, WEBP, GIF, AVIF uniquement)' },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // Clean filename
-    const ext = path.extname(file.name) || '.png';
     const safeBaseName = path
       .basename(file.name, ext)
       .toLowerCase()
@@ -34,6 +59,7 @@ export async function POST(request: Request) {
     const filename = `${Date.now()}-${safeBaseName}${ext}`;
 
     // Upload to Supabase Storage
+    const supabase = getSupabase();
     const { error } = await supabase.storage
       .from('uploads')
       .upload(filename, buffer, {

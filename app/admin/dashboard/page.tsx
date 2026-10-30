@@ -1,10 +1,17 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getAdminFromCookies } from '@/lib/auth';
 import { FolderKanban, FileText, Mail, Video, ArrowUpRight, Sparkles } from 'lucide-react';
 
 export const revalidate = 0; // Fresh admin dashboard stats
 
 export default async function AdminDashboardPage() {
+  const admin = await getAdminFromCookies();
+  if (!admin) {
+    redirect('/admin/login');
+  }
+
   const [projectsCount, postsCount, messagesCount, videosCount, recentMessages] = await Promise.all([
     prisma.project.count(),
     prisma.blogPost.count(),

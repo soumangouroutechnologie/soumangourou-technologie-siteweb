@@ -1,9 +1,16 @@
 import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
+import { getAdminFromCookies } from '@/lib/auth';
 import { Mail, Phone, Building, Calendar, CheckCircle } from 'lucide-react';
 
 export const revalidate = 0;
 
 export default async function AdminMessagesPage() {
+  const admin = await getAdminFromCookies();
+  if (!admin) {
+    redirect('/admin/login');
+  }
+
   const [messages, subscribers] = await Promise.all([
     prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.newsletterSubscriber.findMany({ orderBy: { subscribedAt: 'desc' } }),

@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS "settings" (
     "heroSubtitle" TEXT DEFAULT 'Nous créons des solutions numériques modernes inspirées par notre héritage africain.' NOT NULL,
     "heroVideoUrl" TEXT DEFAULT '/videos/hero.mp4' NOT NULL,
     "companyEmail" TEXT DEFAULT 'info@soumangouroutechnologie.com' NOT NULL,
-    "companyPhone" TEXT DEFAULT '+225 07 08 09 10 11' NOT NULL,
+    "companyPhone" TEXT DEFAULT '+2250706045256' NOT NULL,
     "companyAddress" TEXT DEFAULT 'Abidjan, Côte d''Ivoire' NOT NULL,
     "mapEmbedUrl" TEXT,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -320,19 +320,29 @@ $$ LANGUAGE plpgsql;
 DO $$
 DECLARE
     tbl text;
-    tables text[] := ARRAY[
+    -- Public tables readable by anyone (website visitors)
+    public_readable_tables text[] := ARRAY[
+        'project_categories', 'projects', 'categories', 'tags',
+        'blog_posts', 'post_tags', 'comments', 'testimonials', 'services',
+        'faq', 'galleries', 'gallery_images', 'youtube_videos', 'youtube_playlists',
+        'social_links', 'media', 'settings', 'seo_settings'
+    ];
+    -- All application tables
+    all_tables text[] := ARRAY[
         'users', 'project_categories', 'projects', 'categories', 'tags',
         'blog_posts', 'post_tags', 'comments', 'testimonials', 'services',
         'faq', 'galleries', 'gallery_images', 'youtube_videos', 'youtube_playlists',
         'social_links', 'contacts', 'newsletters', 'media', 'settings', 'seo_settings'
     ];
 BEGIN
-    FOREACH tbl IN ARRAY tables LOOP
-        -- Allow Public Read Access
+    -- Public Read Access: ONLY for public website content (never users, contacts, newsletters)
+    FOREACH tbl IN ARRAY public_readable_tables LOOP
         PERFORM create_rls_policy(tbl, 'Public Read Access', 'SELECT', 'public', 'true');
-        -- Allow Authenticated Users Full Access (Admin / Editor)
+    END LOOP;
+
+    -- Authenticated Users Full Access (Admin / Editor) & Service Role Access
+    FOREACH tbl IN ARRAY all_tables LOOP
         PERFORM create_rls_policy(tbl, 'Admin Full Access', 'ALL', 'authenticated', 'true', 'true');
-        -- Allow Service Role Full Access
         PERFORM create_rls_policy(tbl, 'Service Role Access', 'ALL', 'service_role', 'true', 'true');
     END LOOP;
 END $$;

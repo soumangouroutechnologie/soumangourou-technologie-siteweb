@@ -7,34 +7,49 @@ import { Footer } from '@/components/layout/Footer';
 import { Calendar, Clock, ArrowLeft, Share2, MessageSquare } from 'lucide-react';
 import { FacebookIcon, LinkedinIcon, TwitterXIcon } from '@/components/ui/SocialIcons';
 
-export async function generateStaticParams() {
-  const posts = await prisma.blogPost.findMany({
-    where: { status: 'PUBLISHED' },
-    select: { slug: true },
-  });
+export const dynamicParams = true;
 
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+export async function generateStaticParams() {
+  try {
+    if (!process.env.DATABASE_URL) return [];
+    const posts = await prisma.blogPost.findMany({
+      where: { status: 'PUBLISHED' },
+      select: { slug: true },
+    });
+
+    return posts.map((post) => ({
+      slug: post.slug,
+    }));
+  } catch (error) {
+    console.warn('generateStaticParams skipped (no DB connection at build time):', error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const post = await prisma.blogPost.findUnique({
-    where: { slug },
-  });
+  try {
+    const { slug } = await params;
+    if (!process.env.DATABASE_URL) {
+      return { title: 'Article | SOUMANGOUROU TECHNOLOGIE' };
+    }
+    const post = await prisma.blogPost.findUnique({
+      where: { slug },
+    });
 
-  if (!post) return { title: 'Article non trouvé' };
+    if (!post) return { title: 'Article non trouvé' };
 
-  return {
-    title: `${post.seoTitle || post.title} | SOUMANGOUROU TECHNOLOGIE`,
-    description: post.seoDescription || post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: [post.featuredImage],
-    },
-  };
+    return {
+      title: `${post.seoTitle || post.title} | SOUMANGOUROU TECHNOLOGIE`,
+      description: post.seoDescription || post.excerpt,
+      openGraph: {
+        title: post.title,
+        description: post.excerpt,
+        images: [post.featuredImage],
+      },
+    };
+  } catch {
+    return { title: 'Article | SOUMANGOUROU TECHNOLOGIE' };
+  }
 }
 
 export default async function BlogPostDetailPage({ params }: { params: Promise<{ slug: string }> }) {

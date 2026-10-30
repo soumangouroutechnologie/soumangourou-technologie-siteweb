@@ -57,7 +57,7 @@ export default function RootLayout({
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+2250708091011',
+      telephone: '+2250706045256',
       contactType: 'customer service',
       email: 'info@soumangouroutechnologie.com',
     },

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAdminFromCookies } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -8,7 +9,23 @@ export async function GET() {
       prisma.seoSettings.findUnique({ where: { id: 'default' } }),
     ]);
 
-    return NextResponse.json({ settings, seoSettings });
+    const normalizedSettings = settings
+      ? {
+          ...settings,
+          companyEmail:
+            !settings.companyEmail || settings.companyEmail === 'contact@soumangourou.tech'
+              ? 'info@soumangouroutechnologie.com'
+              : settings.companyEmail,
+          companyPhone:
+            !settings.companyPhone ||
+            settings.companyPhone === '+225 07 08 09 10 11' ||
+            settings.companyPhone === '+2250708091011'
+              ? '+2250706045256'
+              : settings.companyPhone,
+        }
+      : null;
+
+    return NextResponse.json({ settings: normalizedSettings, seoSettings });
   } catch (error) {
     console.error('Error fetching settings:', error);
     return NextResponse.json({ error: 'Erreur lors du chargement des paramètres' }, { status: 500 });
@@ -16,6 +33,11 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const admin = await getAdminFromCookies();
+  if (!admin) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { settingsData, seoData } = body;

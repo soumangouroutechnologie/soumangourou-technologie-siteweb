@@ -98,8 +98,16 @@ export default function AdminSettingsPage() {
           aboutValue4Title: data.settings.aboutValue4Title || '',
           aboutValue4Desc: data.settings.aboutValue4Desc || '',
 
-          companyEmail: data.settings.companyEmail || '',
-          companyPhone: data.settings.companyPhone || '',
+          companyEmail:
+            !data.settings.companyEmail || data.settings.companyEmail === 'contact@soumangourou.tech'
+              ? 'info@soumangouroutechnologie.com'
+              : data.settings.companyEmail,
+          companyPhone:
+            !data.settings.companyPhone ||
+            data.settings.companyPhone === '+225 07 08 09 10 11' ||
+            data.settings.companyPhone === '+2250708091011'
+              ? '+2250706045256'
+              : data.settings.companyPhone,
           companyAddress: data.settings.companyAddress || '',
           mapEmbedUrl: data.settings.mapEmbedUrl || '',
 

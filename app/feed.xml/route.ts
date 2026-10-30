@@ -4,11 +4,18 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://soumangouroutechnologie.com';
 
-  const posts = await prisma.blogPost.findMany({
-    where: { status: 'PUBLISHED' },
-    orderBy: { publishedAt: 'desc' },
-    take: 20,
-  });
+  let posts: any[] = [];
+  try {
+    if (process.env.DATABASE_URL) {
+      posts = await prisma.blogPost.findMany({
+        where: { status: 'PUBLISHED' },
+        orderBy: { publishedAt: 'desc' },
+        take: 20,
+      });
+    }
+  } catch {
+    posts = [];
+  }
 
   const rssItemsXml = posts
     .map(

@@ -31,8 +31,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings }) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const address = settings?.companyAddress || "Abidjan, Côte d'Ivoire";
-  const email = settings?.companyEmail || "info@soumangouroutechnologie.com";
-  const phone = settings?.companyPhone || "+225 07 08 09 10 11";
+  const email =
+    !settings?.companyEmail || settings.companyEmail === 'contact@soumangourou.tech'
+      ? 'info@soumangouroutechnologie.com'
+      : settings.companyEmail;
+  const phone =
+    !settings?.companyPhone ||
+    settings.companyPhone === '+225 07 08 09 10 11' ||
+    settings.companyPhone === '+2250708091011'
+      ? '+2250706045256'
+      : settings.companyPhone;
   const mapEmbedUrl = settings?.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127108.64724773802!2d-4.049449830578613!3d5.348443905470125!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfb8e34927f8a7e5%3A0x6b772413158f4a3e!2sAbidjan%2C%20C%C3%B4te%20d'Ivoire!5e0!3m2!1sfr!2sfr!4v1700000000000!5m2!1sfr!2sfr";
 
   const {

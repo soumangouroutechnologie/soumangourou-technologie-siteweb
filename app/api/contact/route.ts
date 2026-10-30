@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAdminFromCookies } from '@/lib/auth';
 import { z } from 'zod';
 
 const contactSchema = z.object({
-  fullName: z.string().min(2),
-  company: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email(),
-  subject: z.string().min(2),
-  message: z.string().min(10),
+  fullName: z.string().min(2).max(120),
+  company: z.string().max(120).optional(),
+  phone: z.string().max(40).optional(),
+  email: z.string().email().max(180),
+  subject: z.string().min(2).max(200),
+  message: z.string().min(10).max(5000),
 });
 
 export async function POST(request: Request) {
@@ -27,6 +28,11 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  const admin = await getAdminFromCookies();
+  if (!admin) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+  }
+
   try {
     const contacts = await prisma.contactMessage.findMany({
       orderBy: { createdAt: 'desc' },

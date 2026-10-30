@@ -1,7 +1,18 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'soumangourou_super_secret_jwt_key_2026_lux_key';
+function getJwtSecret(): string {
+  if (process.env.JWT_SECRET && process.env.JWT_SECRET.length >= 32) {
+    return process.env.JWT_SECRET;
+  }
+  const seed =
+    process.env.JWT_SECRET ||
+    process.env.DATABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    'soumangourou-cms-fallback-seed';
+  return crypto.createHash('sha256').update(seed).digest('hex');
+}
 
 export interface AdminPayload {
   userId: string;
@@ -10,12 +21,12 @@ export interface AdminPayload {
 }
 
 export function signAdminToken(payload: AdminPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: '7d' });
 }
 
 export function verifyAdminToken(token: string): AdminPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as AdminPayload;
+    return jwt.verify(token, getJwtSecret()) as AdminPayload;
   } catch {
     return null;
   }
@@ -33,10 +44,5 @@ export async function getAdminFromCookies(): Promise<AdminPayload | null> {
     console.error('Cookie verification error:', e);
   }
 
-  // Graceful admin payload for local/dev CMS operations
-  return {
-    userId: 'admin-default-id',
-    email: 'admin@soumangourou.tech',
-    role: 'ADMIN',
-  };
+  return null;
 }
