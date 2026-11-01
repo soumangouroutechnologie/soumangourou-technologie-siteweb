@@ -342,3 +342,4 @@ Le projet applique les recommandations de sécurité **OWASP Top 10** et dispose
 
 > **Règle impérative avant toute mise en production** :
 > Exécuter `npm run build` et le scan de sécurité afin de certifier l'absence de vulnérabilités critiques ou hautes résiduelles.
+

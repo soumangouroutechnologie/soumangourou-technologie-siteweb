@@ -1,0 +1,353 @@
+================================================================================
+SOUMANGOUROU TECHNOLOGIE — DOCUMENTATION TECHNIQUE DE MAINTENANCE
+================================================================================
+
+Site officiel et CMS d'administration de SOUMANGOUROU TECHNOLOGIE
+Solutions numériques modernes inspirées de l'héritage africain.
+URL de production : https://soumangouroutechnologie.com
+Dépôt GitHub : https://github.com/soumangouroutechnologie/soumangourou-technologie-siteweb.git
+
+--------------------------------------------------------------------------------
+TABLE DES MATIÈRES
+--------------------------------------------------------------------------------
+1. Stack Technique & Versions
+2. Arborescence du Projet
+3. Installation & Démarrage en Local
+4. Configuration des Variables d'Environnement (.env)
+5. Base de Données, Modèles & Commandes Prisma
+6. Authentification, Sessions & Sécurité
+7. Architecture de l'Application (App Router)
+8. Référence Exhaustive des API Routes
+9. Guide de l'Espace d'Administration (CMS)
+10. Procédures de Maintenance Courante
+11. Déploiement en Production (Vercel / Node.js)
+12. Audit de Sécurité Automatisé & Recommandations OWASP
+
+================================================================================
+1. STACK TECHNIQUE & VERSIONS
+================================================================================
+
+- Framework Web : Next.js 16.4.3 (Turbopack, App Router, Server Actions)
+- Langage : TypeScript 5.7.3
+- Style & Interface : Tailwind CSS 3.4.17, Framer Motion 12.43.0, Lucide React
+- Base de Données : PostgreSQL via Supabase
+- ORM : Prisma 5.22.0
+- Stockage de Fichiers : Supabase Storage (Bucket "uploads") via @supabase/supabase-js 2.109.0
+- Éditeur de Contenu : TipTap 3.32.2 (Rich Text Editor)
+- Authentification : JSON Web Tokens (jsonwebtoken), bcryptjs, Cookie HttpOnly
+- Validation des Formulaires : Zod 3.25.76 & react-hook-form 7.83.0
+
+================================================================================
+2. ARBORESCENCE DU PROJET
+================================================================================
+
+├── app/
+│   ├── (public)
+│   │   ├── layout.tsx              # Layout racine, polices, métadonnées SEO & JSON-LD
+│   │   ├── page.tsx                # Page d'accueil dynamique (revalidate = 0)
+│   │   ├── blog/[slug]/page.tsx    # Page dynamique d'article de blog
+│   │   ├── feed.xml/route.ts       # Flux RSS automatisé
+│   │   ├── robots.ts               # Directives de crawl robots.txt
+│   │   └── sitemap.ts              # Génération dynamique du sitemap.xml
+│   ├── admin/                      # Espace d'administration CMS (protégé)
+│   │   ├── login/page.tsx          # Page de connexion administrateur
+│   │   ├── dashboard/page.tsx      # Tableau de bord et statistiques
+│   │   ├── projects/page.tsx       # Gestion du catalogue de projets
+│   │   ├── blog/page.tsx           # Rédaction et gestion des articles
+│   │   ├── videos/page.tsx         # Gestion des vidéos YouTube
+│   │   ├── gallery/page.tsx        # Gestion de la médiathèque
+│   │   ├── messages/page.tsx       # Inbox des messages de contact et abonnés
+│   │   └── settings/page.tsx       # Paramètres du site (textes, contact, menus, couleurs)
+│   └── api/                        # Route Handlers Next.js
+│       ├── auth/login              # Connexion admin (émission du cookie admin_token)
+│       ├── auth/logout             # Déconnexion admin
+│       ├── blog                    # CRUD articles de blog
+│       ├── contact                 # Réception (public) et consultation (admin)
+│       ├── gallery                 # CRUD galerie photos
+│       ├── newsletter              # Inscription newsletter
+│       ├── projects                # CRUD projets
+│       ├── settings                # Lecture (public) et modification (admin)
+│       ├── upload                  # Upload sécurisé vers Supabase Storage
+│       └── youtube                 # CRUD vidéos YouTube
+├── components/
+│   ├── layout/                     # Header, Footer
+│   ├── sections/                   # Hero, ProjectsCarousel, AboutSection, BlogSection,
+│   │                               # ContactSection, VideosSection
+│   └── ui/                         # Logo, SocialIcons
+├── lib/
+│   ├── auth.ts                     # Gestion des tokens JWT & lecture du cookie admin
+│   ├── prisma.ts                   # Client Prisma singleton
+│   ├── supabase.ts                 # Client Supabase
+│   └── types.ts                    # Définitions TypeScript
+├── prisma/
+│   ├── schema.prisma               # Définition des 18 modèles PostgreSQL
+│   ├── seed.ts                     # Initialisation TypeScript des données
+│   └── seed.js                     # Initialisation JavaScript alternative
+├── supabase/
+│   └── schema.sql                  # Schéma PostgreSQL initial et politiques RLS
+├── public/                         # Assets publics (logos, icônes, vidéos locales)
+├── proxy.ts                        # Middleware de redirection sécurisée pour /admin/*
+├── vercel.json                     # Configuration Vercel
+├── .env.example                    # Modèle de variables d'environnement
+├── README.md                       # Documentation Markdown
+└── package.json                    # Dépendances et scripts
+
+================================================================================
+3. INSTALLATION & DÉMARRAGE EN LOCAL
+================================================================================
+
+Prérequis :
+- Node.js version 20.x ou 22.x LTS
+- npm version 10.x ou plus
+- Instance PostgreSQL (Supabase recommandée)
+
+Étapes :
+1. Cloner le projet :
+   git clone https://github.com/soumangouroutechnologie/soumangourou-technologie-siteweb.git
+   cd soumangourou-technologie-siteweb
+
+2. Installer les paquets npm :
+   npm install
+
+3. Configurer l'environnement :
+   cp .env.example .env
+   (Puis renseigner les accès dans .env)
+
+4. Synchroniser le schéma Prisma avec la base de données :
+   npm run db:push
+
+5. Injecter le compte admin et les données de démarrage :
+   npm run db:seed
+
+6. Démarrer en mode développement :
+   npm run dev
+   Accéder à l'application sur : http://localhost:3000
+
+================================================================================
+4. CONFIGURATION DES VARIABLES D'ENVIRONNEMENT (.env)
+================================================================================
+
+DATABASE_URL :
+Connexion PostgreSQL poolée pour Prisma en production (port 6543 sur Supabase).
+Exemple :
+DATABASE_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
+
+DIRECT_URL :
+Connexion PostgreSQL directe (port 5432 sur Supabase) indispensable pour exécuter
+les migrations et modifications structurelles de Prisma.
+Exemple :
+DIRECT_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
+
+JWT_SECRET :
+Clé secrète cryptographique utilisée pour signer et vérifier les sessions admin.
+Doit comporter au moins 32 caractères aléatoires.
+Génération rapide : openssl rand -base64 32
+
+NEXT_PUBLIC_SUPABASE_URL :
+URL de l'instance Supabase pour le stockage d'images.
+Exemple : "https://[PROJECT_REF].supabase.co"
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY :
+Clé publique Supabase (anon).
+
+NEXT_PUBLIC_SITE_URL :
+URL canonique de production du site.
+Valeur : "https://soumangouroutechnologie.com"
+
+================================================================================
+5. BASE DE DONNÉES, MODÈLES & COMMANDES PRISMA
+================================================================================
+
+Les 18 modèles définis dans prisma/schema.prisma :
+1. User : Comptes administrateurs (email, passwordHash, role, name)
+2. ProjectCategory : Catégories de projets (SaaS, Web, IA, etc.)
+3. Project : Projets présentés dans le carrousel (titre, résumé, technologies, etc.)
+4. Category : Catégories d'articles de blog
+5. Tag : Mots-clés / étiquettes pour les articles
+6. BlogPost : Articles de blog complets avec SEO et statut (DRAFT / PUBLISHED)
+7. PostTag : Table de liaison entre articles et tags
+8. Comment : Commentaires des lecteurs (avec modération)
+9. Testimonial : Avis et témoignages clients
+10. Service : Services d'expertise de l'agence
+11. Faq : Questions / Réponses fréquentes
+12. Gallery : Albums et collections photo
+13. GalleryImage : Photos de la galerie multimédia
+14. YoutubeVideo : Vidéos YouTube intégrées
+15. YoutubePlaylist : Listes de lecture YouTube
+16. SocialLink : Liens vers les réseaux sociaux officiels
+17. ContactMessage : Messages reçus depuis le formulaire de contact
+18. NewsletterSubscriber : Adresses emails inscrites à la newsletter
+19. Settings : Table singleton ("default") regroupant l'ensemble des textes,
+    titres Hero, valeurs, coordonnées et couleurs du site.
+20. SeoSettings : Paramètres SEO généraux (titre, description, mots-clés, Twitter).
+
+Commandes indispensables :
+- npm run build      : Génère Prisma Client et compile le projet Next.js
+- npm run db:push    : Synchronise le schéma Prisma directement sur PostgreSQL
+- npm run db:seed    : Réinitialise les données initiales et le compte administrateur
+- npx prisma studio  : Ouvre l'interface visuelle de gestion de données Prisma
+
+================================================================================
+6. AUTHENTIFICATION, SESSIONS & SÉCURITÉ
+================================================================================
+
+1. Gestion de Session Administrateur :
+- Lors de la connexion sur /admin/login, l'API valide les identifiants hashés en bcrypt.
+- Un jeton JWT contenant { userId, email, role: 'ADMIN' } est signé.
+- Le jeton est écrit dans le cookie HTTP "admin_token" avec :
+  * httpOnly: true (inaccessible au code client JavaScript, neutralise le vol XSS)
+  * sameSite: 'lax' (protection contre les attaques CSRF)
+  * secure: true (activé automatiquement en production via HTTPS)
+  * Durée de validité : 7 jours
+
+2. Protection Globale /admin/* (proxy.ts) :
+Le fichier proxy.ts intercepte chaque requête vers /admin/* (à l'exception de
+/admin/login). Si le cookie "admin_token" est manquant, l'utilisateur est
+immédiatement redirigé vers la mire de connexion.
+
+3. Défense en profondeur côté serveur :
+Les pages serveur (ex: /admin/dashboard, /admin/messages) et les routes d'API
+administrateur appellent la fonction getAdminFromCookies() dans lib/auth.ts, qui
+effectue une vérification cryptographique rigoureuse de la signature JWT.
+
+4. Politiques RLS (Row Level Security) Supabase :
+- Les tables sensibles (users, contacts, newsletters) ont la lecture publique
+  strictement désactivée.
+- Seuls les administrateurs et le rôle serveur (service_role) peuvent les consulter.
+- Les soumissions publiques (formulaires) sont restreintes à l'opération INSERT.
+- Le bucket de fichiers "uploads" n'autorise les opérations d'écriture et de
+  suppression qu'aux utilisateurs authentifiés.
+
+================================================================================
+7. ARCHITECTURE DE L'APPLICATION (APP ROUTER)
+================================================================================
+
+- Page d'Accueil (app/page.tsx) :
+  Composant serveur avec "export const revalidate = 0". Les données modifiées
+  dans le CMS sont reflétées immédiatement pour les visiteurs.
+  La page orchestre :
+  * Header : Barre de navigation sticky et bouton CTA
+  * Hero : Vidéo de fond haute performance et titre principal
+  * ProjectsCarousel : Carrousel interactif des réalisations
+  * AboutSection : Présentation d'entreprise et 4 valeurs clés
+  * BlogSection : Les 6 derniers articles publiés
+  * ContactSection : Coordonnées (dont le numéro officiel +2250706045256),
+    formulaire validé par Zod et carte Google Maps intégrée
+  * Footer : Slogan, réseaux sociaux, copyright et module newsletter
+
+- Articles de Blog (app/blog/[slug]/page.tsx) :
+  Rendu dynamique avec génération de métadonnées SEO spécifiques (OpenGraph) et
+  section de commentaires.
+
+================================================================================
+8. RÉFÉRENCE EXHAUSTIVE DES API ROUTES
+================================================================================
+
+Route                    Méthode  Accès         Description
+--------------------------------------------------------------------------------
+/api/auth/login          POST     Public        Connexion admin (reçoit email & password)
+/api/auth/logout         POST     Authentifié   Supprime le cookie de session admin
+/api/auth/logout         GET      Authentifié   Vérifie la validité de la session
+/api/settings            GET      Public        Retourne les paramètres généraux du site
+/api/settings            PUT      Admin         Met à jour les paramètres (Hero, About, etc.)
+/api/contact             POST     Public        Enregistre un message (validé par Zod)
+/api/contact             GET      Admin         Liste tous les messages reçus
+/api/blog                GET      Public        Liste les articles de blog
+/api/blog                POST     Admin         Crée un nouvel article de blog
+/api/blog?id=[ID]        DELETE   Admin         Supprime un article de blog
+/api/projects            GET      Public        Liste les projets du catalogue
+/api/projects            POST     Admin         Ajoute un nouveau projet
+/api/projects?id=[ID]    DELETE   Admin         Supprime un projet
+/api/gallery             GET      Public        Liste les photos de la galerie
+/api/gallery             POST     Admin         Ajoute une photo à la galerie
+/api/gallery?id=[ID]     DELETE   Admin         Supprime une photo
+/api/upload              POST     Admin         Téléverse un fichier (max 5 Mo, images)
+/api/youtube             GET      Public        Liste les vidéos YouTube
+/api/youtube             POST     Admin         Ajoute une vidéo YouTube
+/api/youtube?id=[ID]     DELETE   Admin         Supprime une vidéo
+/api/newsletter          POST     Public        Inscrit un email à la newsletter
+
+================================================================================
+9. GUIDE DE L'ESPACE D'ADMINISTRATION (CMS)
+================================================================================
+
+Accès : Rendez-vous sur https://votredomaine.com/admin/login
+
+Sections du CMS :
+1. Tableau de bord (/admin/dashboard) :
+   Compteurs globaux (projets, articles, vidéos, messages) et aperçu des
+   derniers messages reçus.
+2. Projets (/admin/projects) :
+   Ajout de projets avec image de couverture, technologies et liens live.
+3. Articles Blog (/admin/blog) :
+   Rédaction d'articles avec éditeur, temps de lecture et image de une.
+4. Vidéos (/admin/videos) :
+   Ajout de vidéos par leur identifiant YouTube (ex: dQw4w9WgXcQ).
+5. Galerie (/admin/gallery) :
+   Ajout de visuels avec titre et légende.
+6. Messages & Contact (/admin/messages) :
+   Consultation des demandes clients et export visuel des abonnés newsletter.
+7. Paramètres (/admin/settings) :
+   - Onglet 1 (Hero) : Titre, sous-titre, URL vidéo, bouton d'action.
+   - Onglet 2 (À Propos) : Textes, badge, image et les 4 valeurs d'entreprise.
+   - Onglet 3 (Contact) : Email officiel, téléphone (+2250706045256), adresse et lien Maps.
+   - Onglet 4 (SEO) : Meta title, meta description, mots-clés, compte X / Twitter.
+   - Onglet 5 (Menu) : Liens de navigation du site.
+   - Onglet 6 (Couleurs) : Codes couleurs hexadécimaux du thème.
+
+================================================================================
+10. PROCÉDURES DE MAINTENANCE COURANTE
+================================================================================
+
+A. Modifier les coordonnées officielles :
+Dans le CMS (/admin/settings, onglet Contact), ou dans le code aux fichiers :
+- components/sections/ContactSection.tsx
+- app/layout.tsx
+- prisma/schema.prisma
+
+B. Réinitialiser un compte administrateur :
+Exécuter la commande :
+npm run db:seed
+Ou générer un hash bcrypt manuellement :
+node -e "console.log(require('bcryptjs').hashSync('NouveauMotDePasse!', 10))"
+Puis mettre à jour le champ "passwordHash" dans la table "users".
+
+C. Évolution du schéma de base de données :
+1. Modifier prisma/schema.prisma
+2. Exécuter : npx prisma generate
+3. Exécuter : npm run db:push
+4. Reporter les changements dans supabase/schema.sql si nécessaire.
+
+================================================================================
+11. DÉPLOIEMENT EN PRODUCTION (VERCEL / NODE.JS)
+================================================================================
+
+Déploiement Vercel :
+1. Connecter le dépôt GitHub sur Vercel.
+2. Le framework détecté doit être "Next.js".
+3. Renseigner les variables d'environnement dans le projet Vercel :
+   - DATABASE_URL
+   - DIRECT_URL
+   - JWT_SECRET
+   - NEXT_PUBLIC_SUPABASE_URL
+   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+   - NEXT_PUBLIC_SITE_URL
+4. Commande de build automatique :
+   prisma generate && next build
+
+================================================================================
+12. AUDIT DE SÉCURITÉ AUTOMATISÉ & RECOMMANDATIONS OWASP
+================================================================================
+
+Le projet intègre un scanner de sécurité local situé dans :
+~/security-tools/security-scan.sh
+
+Il analyse le projet avec trois moteurs complémentaires :
+- Semgrep  : Analyse statique du code (détection d'injections, contournements d'auth)
+- Trivy    : Vulnérabilités de dépendances npm (CVE/GHSA)
+- Gitleaks : Détection de clés API ou tokens sensibles
+
+Règle stricte de livraison :
+Le projet doit compiler sans erreur (npm run build) et ne présenter aucune
+vulnérabilité critique ou haute avant toute mise en ligne.
+================================================================================
